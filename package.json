@@ -11,6 +11,8 @@
     "vite": "^2.6.5"
   },
   "dependencies": {
+    "@fontsource/inconsolata": "^4.5.0",
+    "@fontsource/inter": "^4.5.0",
     "vue": "^3.2.19"
   }
 }
