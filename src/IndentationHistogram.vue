@@ -1,8 +1,8 @@
 <template>
   <section class="
-    mr-auto h-full text-6 leading-0
+    mx-auto h-full text-6 leading-0
     flex flex-col gap-2 p-6
-    font-mono text-primary-800 bg-primary-1200
+    font-mono text-primary-900 bg-primary-50
   ">
     <section class="h-full w-full flex gap-2">
       <section class="h-full flex flex-col justify-between">
@@ -28,7 +28,7 @@
         >
           <div
             class="mx-auto w-7 rounded"
-            :class="total === 0 ? '' : 'bg-primary-800'"
+            :class="total === 0 ? '' : 'bg-primary-900'"
           />
         </div>
       </section>
@@ -56,7 +56,7 @@ const indentations = props.code
         .split(`\n`)
         .map(line => line.match(/^( +)/)?.[1] ?? '')
         .map(line => line.length),
-      horizontalNums = (new Array(19))
+      horizontalNums = (new Array(12))
         .fill(undefined)
         .map((_, index) => index)
         .filter(num => num % 2 === 0),
@@ -64,6 +64,6 @@ const indentations = props.code
         num,
         total: indentations.filter(indentation => indentation === num).length
       }))),
-      maxTotal = shallowRef(80),
+      maxTotal = shallowRef(60),
       verticalNums = shallowRef(new Array(maxTotal.value / 10 + 1).fill(undefined).map((_, index) => index * 10).reverse())
 </script>

@@ -2,9 +2,8 @@
   <main class="bg-gray-800 p-20 h-screen w-screen flex">
     <IndentationHistogram :code="ensuredCode" />
   </main>
-  <main class="bg-gray-800 p-20">
-    <section class="mt-10 relative w-auto flex bg-white">
-      <pre><code>{{ lineNumbers }}</code></pre>
+  <main class="flex p-20 bg-gray-800">
+    <section class="relative mx-auto w-auto flex px-6 bg-white">
       <pre><code>{{ ensuredCode }}</code></pre>
       <div
         class="absolute top-0 left-0 h-full w-full"
@@ -24,7 +23,7 @@
 
 <script setup lang="ts">
 import { shallowRef } from 'vue'
-import { code } from './comparisons/organizing-code-by-logical-concern/CompositionApiListboxOrganizedByLogicalConcern'
+import { code } from './comparisons/organizing-code-by-logical-concern/OptionsApiListbox'
 import { meta } from './comparisons/organizing-code-by-logical-concern/meta'
 import { toCode } from './toCode'
 import { toConcerns } from './toConcerns'
