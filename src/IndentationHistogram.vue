@@ -56,7 +56,7 @@ const indentations = props.code
         .split(`\n`)
         .map(line => line.match(/^( +)/)?.[1] ?? '')
         .map(line => line.length),
-      horizontalNums = (new Array(12))
+      horizontalNums = (new Array(19))
         .fill(undefined)
         .map((_, index) => index)
         .filter(num => num % 2 === 0),
