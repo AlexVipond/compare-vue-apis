@@ -23,6 +23,9 @@
       </div>
     </section>
   </main>
+  <main class="flex justify-center p-20 bg-gray-800">
+    <CompoundCommunication />
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -38,6 +41,7 @@ import { toCode } from './toCode'
 import { toConcerns } from './toConcerns'
 import Highlight from './Highlight.vue'
 import IndentationHistogram from './IndentationHistogram.vue'
+import CompoundCommunication from './CompoundCommunication.vue'
 
 const ensuredCode = shallowRef(toCode(code)),
       lineNumbers = new Array(ensuredCode.value.split('\n').length)
