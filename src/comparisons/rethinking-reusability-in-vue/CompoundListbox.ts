@@ -1,7 +1,7 @@
 export const code = `\
 import { // BOILERPLATE
   defineComponent, provide, inject,
-  ref, watch, computed, onMounted, onBeforeUpdate
+  shallowRef, ref, watch, computed
 } from 'vue'
 import type { PropType } from 'vue'
 
@@ -19,88 +19,88 @@ export const Listbox = defineComponent({
       type: String,
     },
   },
-  setup (props, { slots, emit, expose }) {
-    const optionsElements = ref<HTMLElement[]>([]) // ELEMENTS
-    
-    const storeOptionsElement = (index: number, element: HTMLElement) => {
-      optionsElements.value[index] = element
+  setup (props, { slots, emit }) {
+    const ids = shallowRef<{ [option: string]: string }>({}) // IDS
+
+    const storeId = (option: string, id: string) => {
+      ids.value[option] = id
     }
-
-    onBeforeUpdate(() => optionsElements.value = [])
-
-    const ids = ref([]) // IDS
-    onMounted(() => ids.value = optionsElements.value
-      .map(() => 'compound-listbox-option-' + totalIds++))
     
-    const active = ref(0) // ACTIVE
+    const active = ref(props.options[0]) // ACTIVE
     const ariaActivedescendant = computed(() => ids.value[active.value])
 
-    const activate = (index: number) => {
-      active.value = index
+    const activate = (option: string) => {
+      active.value = option
     }
 
-    const activatePrevious = (index: number) => {
+    const activatePrevious = (option: string) => {
+      const index = props.options.indexOf(option)
+
       if (index === 0) {
         return
       }
 
-      active.value = index - 1
+      active.value = props.options[index - 1]
     }
 
-    const activateNext = (index: number) => {
-      if (index === optionsElements.value.length - 1) {
+    const activateNext = (option: string) => {
+      const index = props.options.indexOf(option)
+
+      if (index === props.options.length - 1) {
         return
       }
 
-      active.value = index + 1
+      active.value = props.options[index + 1]
     }
 
-    const isActive = (index: number) => {
-      return index === active.value
+    const activateFirst = () => {
+      active.value = props.options[0]
     }
 
-    const selected = computed(() => props.options.indexOf(props.modelValue)) // SELECTED
-
-    const select = (index: number) => {
-      emit('update:modelValue', props.options[index])
+    const activateLast = () => {
+      active.value = props.options[props.options.length - 1]
     }
 
-    const isSelected = (index: number) => {
-      return index === selected.value
+    const isActive = (option: string) => {
+      return option === active.value
     }
 
-    watch( // FOCUS MANAGEMENT
-      [active, selected],
-      () => {
-        optionsElements.value[active.value].focus()
-      },
-      { flush: 'post' }
-    )
+    const selected = computed(() => props.modelValue) // SELECTED
+
+    const select = (option: string) => {
+      emit('update:modelValue', option)
+    }
+
+    const isSelected = (option: string) => {
+      return option === selected.value
+    }
 
     provide(ListboxSymbol, { // BOILERPLATE
-      options: props.options,
-      storeOptionsElement, // elements
-      ids, // ids
-      activate, // ACTIVE
+      storeId, // IDS
+      active, // ACTIVE
+      activate,
       activatePrevious,
       activateNext,
+      activateFirst,
+      activateLast,
       isActive,
-      select, // SELECTED
+      selected, // SELECTED
+      select,
       isSelected,
     }) // BOILERPLATE
 
-    const bindings = computed(() => ({
-      role: 'listbox', // BASIC ACCESSIBILITY
-      'aria-orientation': 'vertical',
-      'aria-activedescendant': ariaActivedescendant.value, // active
-      tabindex: -1, // focus management
-    })) // BOILERPLATE
-
     return () => slots.default({
-      bindings: bindings.value,
+      bindings: {
+        role: 'listbox', // BASIC ACCESSIBILITY
+        'aria-orientation': 'vertical',
+        'aria-activedescendant': ariaActivedescendant.value, // ACTIVE
+        tabindex: -1, // FOCUS MANAGEMENT
+      }, // BOILERPLATE
       active, // ACTIVE
       activate,
-      selected,
+      activateFirst,
+      activateLast,
+      selected, // SELECTED
       select,
     }) // BOILERPLATE
   }
@@ -115,60 +115,78 @@ export const ListboxOption = defineComponent({
   },
   setup (props, { slots }) {
     const {
-      options,
-      storeOptionsElement, // elements
-      ids, // ids
-      activate, // ACTIVE
+      storeId, // IDS
+      active, // ACTIVE
+      activate,
       activatePrevious,
       activateNext,
+      activateFirst,
+      activateLast,
       isActive,
-      select, // SELECTED
+      selected, // SELECTED
+      select,
       isSelected,
     } = inject(ListboxSymbol) // BOILERPLATE
 
-    const index = options.indexOf(props.option)
-    
-    const id = computed(() => ids.value[index]) // IDS
+    const id = 'compound-listbox-option-' + totalIds++
+    storeId(props.option, id)
 
-    return () => slots.default({ // BOILERPLATE
-      bindings: {
-        role: 'option', // BASIC ACCESSIBILITY
-        id, // ids
-        'aria-selected': isSelected(index), // SELECTED
-        tabindex: isSelected(index) ? 0 : -1, // focus management
-        ref: el => storeOptionsElement(index, el), // elements
-        onMouseenter: () => activate(index), // ACTIVE
-        onClick: () => select(index), // SELECTED
-        onKeydown: event => { // ACTIVE
-          switch (event.key) {
-            case 'ArrowUp':
-              event.preventDefault()
-              if (event.metaKey) {
-                activate(0)
-                break
-              }
-              activatePrevious(index)
-              break
-            case 'ArrowDown':
-              event.preventDefault()
-              if (event.metaKey) {
-                activate(options.length - 1)
-                break
-              }
-              activateNext(index)
-              break
-            case 'Enter':
-            case ' ':
-              event.preventDefault()
-              select(index)
-              break
-          }
-        },
+    const getEl = shallowRef<() => HTMLElement>() // FOCUS MANAGEMENT
+    
+    watch(
+      [active, selected],
+      () => {
+        if (isActive(props.option)) {
+          getEl.value().focus()
+        }
       },
-      isActive: () => isActive(index),
-      isSelected: () => isSelected(index), // SELECTED
-      activatePrevious: () => activatePrevious(index), // ACTIVE
-      activateNext: () => activateNext(index),
-    }) // BOILERPLATE
+      { flush: 'post' }
+    )
+
+    return () => { // BOILERPLATE
+      const rendered = slots.default({
+        bindings: {
+          role: 'option', // BASIC ACCESSIBILITY
+          id, // IDS
+          tabindex: isSelected(props.option) ? 0 : -1, // FOCUS MANAGEMENT
+          'aria-selected': isSelected(props.option), // SELECTED
+          onClick: () => select(props.option),
+          onMouseenter: () => activate(props.option), // ACTIVE
+          onKeydown: event => {
+            switch (event.key) {
+              case 'ArrowUp':
+                event.preventDefault()
+                if (event.metaKey) {
+                  activateFirst()
+                  break
+                }
+                activatePrevious(props.option)
+                break
+              case 'ArrowDown':
+                event.preventDefault()
+                if (event.metaKey) {
+                  activateLast()
+                  break
+                }
+                activateNext(props.option)
+                break
+              case 'Enter': // SELECTED
+              case ' ':
+                event.preventDefault()
+                select(props.option)
+                break
+            }
+          },
+        }, // BOILERPLATE
+        isActive: () => isActive(props.option), // ACTIVE
+        activatePrevious: () => activatePrevious(props.option),
+        activateNext: () => activateNext(props.option),
+        isSelected: () => isSelected(props.option), // SELECTED
+      }) // BOILERPLATE
+
+      getEl.value = () => rendered[0].el as HTMLElement // FOCUS MANAGEMENT
+
+      return rendered // BOILERPLATE
+    }
   }
 })`
