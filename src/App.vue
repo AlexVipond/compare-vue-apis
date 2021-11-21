@@ -7,7 +7,7 @@
     <IndentationHistogram :code="ensuredCode" />
   </main>
   <main class="p-20 bg-gray-800">
-    <section class="relative mx-auto h-auto w-[650px] flex px-6 bg-white">
+    <section class="relative mx-auto h-auto w-[650px] px-6 bg-white">
       <pre class="font-mono"><code>{{ ensuredCode }}</code></pre>
       <div
         class="absolute top-0 left-0 h-full w-full"
@@ -33,8 +33,8 @@ import { shallowRef } from 'vue'
 // import { code } from './comparisons/organizing-code-by-logical-concern/OptionsApiListbox'
 // import { code } from './comparisons/organizing-code-by-logical-concern/CompositionApiListboxOrganizedByOptions'
 // import { code } from './comparisons/organizing-code-by-logical-concern/CompositionApiListboxOrganizedByLogicalConcern'
-// import { code } from './comparisons/rethinking-reusability-in-vue/FunctionRefListbox'
-import { code } from './comparisons/rethinking-reusability-in-vue/CompoundListbox'
+import { code } from './comparisons/rethinking-reusability-in-vue/FunctionRefListbox'
+// import { code } from './comparisons/rethinking-reusability-in-vue/CompoundListbox'
 // import { meta } from './comparisons/organizing-code-by-logical-concern/meta'
 import { meta } from './comparisons/rethinking-reusability-in-vue/meta'
 import { toCode } from './toCode'

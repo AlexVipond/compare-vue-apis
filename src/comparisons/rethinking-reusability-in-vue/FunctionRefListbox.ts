@@ -5,6 +5,11 @@ import { bind, on } from '@baleada/vue-features'
 let totalIds = 0
 
 export function useListbox () {
+  const rootElement = ref<HTMLElement>()
+  const rootRef = (element: HTMLElement) => {
+    rootElement.value = element
+  }
+
   const optionsElements = ref<HTMLElement[]>([])
   const getOptionRef = (index: number) => (element: HTMLElement) => {
     optionsElements.value[index] = element
@@ -25,12 +30,7 @@ export function useListbox () {
     }
   })
 
-  const rootElement = ref<HTMLElement>() // BASIC ACCESSIBILITY
-  const rootRef = (element: HTMLElement) => {
-    rootElement.value = element
-  }
-
-  bind({
+  bind({ // BASIC ACCESSIBILITY
     element: rootElement,
     values: {
       role: 'listbox',
@@ -66,6 +66,14 @@ export function useListbox () {
     active.value = index + 1
   }
 
+  const activateFirst = () => {
+    active.value = 0
+  }
+
+  const activateLast = () => {
+    active.value = optionsElements.value.length - 1
+  }
+
   const isActive = (index: number) => {
     return index === active.value
   }
@@ -80,11 +88,11 @@ export function useListbox () {
     effects: {
       'cmd+down': event => {
         event.preventDefault()
-        activate(optionsElements.value.length - 1)
+        activateLast()
       },
       'cmd+up': event => {
         event.preventDefault()
-        activate(0)
+        activateFirst()
       },
       mouseenter: {
         createEffect: ({ index }) => () => activate(index),
