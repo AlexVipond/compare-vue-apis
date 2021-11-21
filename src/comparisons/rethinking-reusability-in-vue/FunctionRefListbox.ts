@@ -5,7 +5,7 @@ import { bind, on } from '@baleada/vue-features'
 let totalIds = 0
 
 export function useListbox () {
-  const optionsElements = ref<HTMLElement[]>([]) // ELEMENTS
+  const optionsElements = ref<HTMLElement[]>([])
   const getOptionRef = (index: number) => (element: HTMLElement) => {
     optionsElements.value[index] = element
   }
