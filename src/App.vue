@@ -1,7 +1,6 @@
 <template>
-  <main class="bg-gray-800 p-20 flex flex-col items-center gap-6 text-3xl text-gray-200 font-mono">
-    <span>{{ ensuredCode.split('\n').length }} lines</span>
-    <span>{{ ensuredCode.length }} characters</span>
+  <main class="h-screen w-screen bg-gray-800 p-20 flex items-center gap-6 font-mono">
+    <Counts />
   </main>
   <main class="bg-gray-800 p-20 h-screen w-screen flex font-mono">
     <IndentationHistogram :code="ensuredCode" />
@@ -33,8 +32,8 @@ import { shallowRef } from 'vue'
 // import { code } from './comparisons/organizing-code-by-logical-concern/OptionsApiListbox'
 // import { code } from './comparisons/organizing-code-by-logical-concern/CompositionApiListboxOrganizedByOptions'
 // import { code } from './comparisons/organizing-code-by-logical-concern/CompositionApiListboxOrganizedByLogicalConcern'
-import { code } from './comparisons/rethinking-reusability-in-vue/FunctionRefListbox'
-// import { code } from './comparisons/rethinking-reusability-in-vue/CompoundListbox'
+// import { code } from './comparisons/rethinking-reusability-in-vue/FunctionRefListbox'
+import { code } from './comparisons/rethinking-reusability-in-vue/CompoundListbox'
 // import { meta } from './comparisons/organizing-code-by-logical-concern/meta'
 import { meta } from './comparisons/rethinking-reusability-in-vue/meta'
 import { toCode } from './toCode'
@@ -42,6 +41,7 @@ import { toConcerns } from './toConcerns'
 import Highlight from './Highlight.vue'
 import IndentationHistogram from './IndentationHistogram.vue'
 import CompoundCommunication from './CompoundCommunication.vue'
+import Counts from './Counts.vue'
 
 const ensuredCode = shallowRef(toCode(code)),
       lineNumbers = new Array(ensuredCode.value.split('\n').length)
@@ -50,5 +50,4 @@ const ensuredCode = shallowRef(toCode(code)),
         .join('\n'),
       ensuredConcerns = shallowRef(toConcerns({ code, meta }))
 
-console.log(ensuredCode.value.length)
 </script>

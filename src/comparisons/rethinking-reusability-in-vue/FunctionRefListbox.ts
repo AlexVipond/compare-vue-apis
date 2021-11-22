@@ -171,7 +171,8 @@ export function useListbox () {
   })
 
   return { // BOILERPLATE
-    active, activate, activatePrevious, activateNext, isActive,
+    active, activate, isActive,
+    activatePrevious, activateNext, activateFirst, activateLast,
     selected, select, isSelected,
     rootRef,
     getOptionRef,
