@@ -16,7 +16,7 @@ export default defineComponent({
     }
   },
   data: () => ({ // boilerplate
-    active: 0, // active
+    focused: 0, // active
     elements: [], // focus management
   }), // boilerplate
   computed: { // boilerplate
@@ -29,27 +29,27 @@ export default defineComponent({
     select (index) { // SELECTED
       this.$emit('update:modelValue', this.options[index])
     },
-    activate (index) { // ACTIVE
-      this.active = index
+    focus (index) { // FOCUSED
+      this.focused = index
     },
-    activatePrevious (index) {
+    focusPrevious (index) {
       if (index === 0) {
         return
       }
       
-      this.active = index - 1
+      this.focused = index - 1
     },
-    activateNext (index) {
+    focusNext (index) {
       if (index === this.options.length - 1) {
         return
       }
       
-      this.active = index + 1
+      this.focused = index + 1
     },
     isSelected (index) { // SELECTED
       return index === this.selected
     },
-    isActive (index) { // ACTIVE
+    isFocused (index) { // FOCUSED
       return index === this.active
     },
     setElements (el, index) { // FOCUS MANAGEMENT
@@ -57,12 +57,12 @@ export default defineComponent({
     }
   }, // boilerplate
   watch: { // boilerplate
-    active () { // FOCUS MANAGEMENT
-      this.elements[this.active].focus()
+    focused () { // FOCUS MANAGEMENT
+      this.elements[this.focused].focus()
     }
   }, // boilerplate
   mounted () { // FOCUS MANAGEMENT
-    this.elements[this.active].focus()
+    this.elements[this.focused].focus()
   },
   beforeUpdate () {
     this.elements = []

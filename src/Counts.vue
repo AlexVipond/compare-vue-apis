@@ -29,7 +29,7 @@
           class="relative w-24 flex"
           :style="{ height: `${codeMeta[chart.prop] / chart.maxTotal * 100}%`, minHeight: '1px' }"
         >
-          <div class="mx-auto w-7 rounded" />
+          <div class="mx-auto w-7 rounded bg-primary-900" />
         </div>
       </section>
     </section>

@@ -11,7 +11,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', option: string): void,
 }>()
 
-const active = ref(0) // ACTIVE
+const focused = ref(0) // FOCUSED
 
 const elements = ref([]) // FOCUS MANAGEMENT
 
@@ -24,32 +24,32 @@ const select = (index: number) => {
   emit('update:modelValue', props.options[index])
 }
 
-const activate = (index: number) => { // ACTIVE
-  active.value = index
+const focus = (index: number) => { // FOCUSED
+  focused.value = index
 }
 
-const activatePrevious = (index: number) => {
+const focusPrevious = (index: number) => {
   if (index === 0) {
     return
   }
 
-  active.value = index - 1
+  focused.value = index - 1
 }
 
-const activateNext = (index: number) => {
+const focusNext = (index: number) => {
   if (index === props.options.length - 1) {
     return
   }
 
-  active.value = index + 1
+  focused.value = index + 1
 }
 
 const isSelected = (index: number) => { // SELECTED
   return index === selected.value
 }
 
-const isActive = (index: number) => { // ACTIVE
-  return index === active.value
+const isFocused = (index: number) => { // FOCUSED
+  return index === focused.value
 }
 
 const setElements = (el, index: number) => { // FOCUS MANAGEMENT
@@ -57,15 +57,15 @@ const setElements = (el, index: number) => { // FOCUS MANAGEMENT
 }
 
 watch( // FOCUS MANAGEMENT
-  active,
+  focused,
   () => {
-    elements.value[active.value].focus()
+    elements.value[focused.value].focus()
   },
   { flush: 'post' }
 )
 
 onMounted(() => {
-  elements.value[active.value].focus()
+  elements.value[focused.value].focus()
 })
 
 onBeforeUpdate(() => {

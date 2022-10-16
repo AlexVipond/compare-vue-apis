@@ -3,9 +3,23 @@ import { // BOILERPLATE
   defineComponent, provide, inject,
   shallowRef, ref, watch, computed
 } from 'vue'
-import type { PropType } from 'vue'
+import type { PropType, InjectionKey, Ref } from 'vue'
 
-const ListboxSymbol = Symbol('Listbox')
+const ListboxSymbol: InjectionKey<ListboxProvided> = Symbol('Listbox')
+
+type ListboxProvided = { // BOILERPLATE
+  storeId: (option: string, id: string) => void, // IDS
+  focused: Ref<string>, // FOCUSED
+  focus: (option: string) => void,
+  focusPrevious: (option: string) => void,
+  focusNext: (option: string) => void,
+  focusFirst: () => void,
+  focusLast: () => void,
+  isFocused: (option: string) => boolean,
+  selected: Ref<string>, // SELECTED
+  select: (option: string) => void,
+  isSelected: (option: string) => boolean,
+} // BOILERPLATE
 
 let totalIds = 0
 
@@ -20,49 +34,49 @@ export const Listbox = defineComponent({
     },
   },
   setup (props, { slots, emit }) {
-    const ids = shallowRef<{ [option: string]: string }>({}) // IDS
+    const ids = ref<{ [option: string]: string }>({}) // IDS
 
     const storeId = (option: string, id: string) => {
       ids.value[option] = id
     }
     
-    const active = ref(props.options[0]) // ACTIVE
-    const ariaActivedescendant = computed(() => ids.value[active.value])
+    const focused = ref(props.options[0]) // FOCUSED
+    const ariaActivedescendant = computed(() => ids.value[focused.value])
 
-    const activate = (option: string) => {
-      active.value = option
+    const focus = (option: string) => {
+      focused.value = option
     }
 
-    const activatePrevious = (option: string) => {
+    const focusPrevious = (option: string) => {
       const index = props.options.indexOf(option)
 
       if (index === 0) {
         return
       }
 
-      active.value = props.options[index - 1]
+      focused.value = props.options[index - 1]
     }
 
-    const activateNext = (option: string) => {
+    const focusNext = (option: string) => {
       const index = props.options.indexOf(option)
 
       if (index === props.options.length - 1) {
         return
       }
 
-      active.value = props.options[index + 1]
+      focused.value = props.options[index + 1]
     }
 
-    const activateFirst = () => {
-      active.value = props.options[0]
+    const focusFirst = () => {
+      focused.value = props.options[0]
     }
 
-    const activateLast = () => {
-      active.value = props.options[props.options.length - 1]
+    const focusLast = () => {
+      focused.value = props.options[props.options.length - 1]
     }
 
-    const isActive = (option: string) => {
-      return option === active.value
+    const isFocused = (option: string) => {
+      return option === focused.value
     }
 
     const selected = computed(() => props.modelValue) // SELECTED
@@ -77,13 +91,13 @@ export const Listbox = defineComponent({
 
     provide(ListboxSymbol, { // BOILERPLATE
       storeId, // IDS
-      active, // ACTIVE
-      activate,
-      activatePrevious,
-      activateNext,
-      activateFirst,
-      activateLast,
-      isActive,
+      focused, // FOCUSED
+      focus,
+      focusPrevious,
+      focusNext,
+      focusFirst,
+      focusLast,
+      isFocused,
       selected, // SELECTED
       select,
       isSelected,
@@ -93,13 +107,13 @@ export const Listbox = defineComponent({
       bindings: {
         role: 'listbox', // BASIC ACCESSIBILITY
         'aria-orientation': 'vertical',
-        'aria-activedescendant': ariaActivedescendant.value, // ACTIVE
+        'aria-activedescendant': ariaActivedescendant.value, // FOCUSED
         tabindex: -1, // FOCUS MANAGEMENT
       }, // BOILERPLATE
-      active, // ACTIVE
-      activate,
-      activateFirst,
-      activateLast,
+      focused, // FOCUSED
+      focus,
+      focusFirst,
+      focusLast,
       selected, // SELECTED
       select,
     }) // BOILERPLATE
@@ -116,13 +130,13 @@ export const ListboxOption = defineComponent({
   setup (props, { slots }) {
     const {
       storeId, // IDS
-      active, // ACTIVE
-      activate,
-      activatePrevious,
-      activateNext,
-      activateFirst,
-      activateLast,
-      isActive,
+      focused, // FOCUSED
+      focus,
+      focusPrevious,
+      focusNext,
+      focusFirst,
+      focusLast,
+      isFocused,
       selected, // SELECTED
       select,
       isSelected,
@@ -131,12 +145,12 @@ export const ListboxOption = defineComponent({
     const id = 'compound-listbox-option-' + totalIds++
     storeId(props.option, id)
 
-    const getEl = shallowRef<() => HTMLElement>() // FOCUS MANAGEMENT
+    const getEl = ref<() => HTMLElement>() // FOCUS MANAGEMENT
     
     watch(
-      [active, selected],
+      [focused, selected],
       () => {
-        if (isActive(props.option)) {
+        if (isFocused(props.option)) {
           getEl.value().focus()
         }
       },
@@ -151,24 +165,24 @@ export const ListboxOption = defineComponent({
           tabindex: isSelected(props.option) ? 0 : -1, // FOCUS MANAGEMENT
           'aria-selected': isSelected(props.option), // SELECTED
           onClick: () => select(props.option),
-          onMouseenter: () => activate(props.option), // ACTIVE
+          onMouseenter: () => focus(props.option), // FOCUSED
           onKeydown: event => {
             switch (event.key) {
               case 'ArrowUp':
                 event.preventDefault()
                 if (event.metaKey) {
-                  activateFirst()
+                  focusFirst()
                   break
                 }
-                activatePrevious(props.option)
+                focusPrevious(props.option)
                 break
               case 'ArrowDown':
                 event.preventDefault()
                 if (event.metaKey) {
-                  activateLast()
+                  focusLast()
                   break
                 }
-                activateNext(props.option)
+                focusNext(props.option)
                 break
               case 'Enter': // SELECTED
               case ' ':
@@ -178,9 +192,9 @@ export const ListboxOption = defineComponent({
             }
           },
         }, // BOILERPLATE
-        isActive: () => isActive(props.option), // ACTIVE
-        activatePrevious: () => activatePrevious(props.option),
-        activateNext: () => activateNext(props.option),
+        isFocused: () => isFocused(props.option), // FOCUSED
+        focusPrevious: () => focusPrevious(props.option),
+        focusNext: () => focusNext(props.option),
         isSelected: () => isSelected(props.option), // SELECTED
       }) // BOILERPLATE
 
